@@ -1,0 +1,313 @@
+#include <cstring>
+#include <fstream>
+#include <iostream>
+using namespace std;
+typedef struct student {
+ int rollNo;
+ char name[50];
+ char div;
+ char address[100];
+} student;
+class studentDatabase {
+ string fileName = "student_data.dat";
+ public:
+ studentDatabase() {
+  fstream fileObj(fileName);
+  if (fileObj.fail()) {
+   fileObj.open(fileName, ios::out);
+   cout << "New file created." << endl;
+  } else {
+   cout << "File already exists." << endl;
+  }
+  fileObj.close();
+ }
+ void addStudent();
+ void searchStudent();
+ void deleteStudent();
+ void displayAll();
+};
+void studentDatabase::searchStudent() {
+ int roll;
+ student s;
+ bool status = false;
+ cout << "Roll number to search:\t";
+ cin >> roll;
+ ifstream readFile;
+ readFile.open(fileName, ios::in | ios::binary);
+ while (readFile.read((char*)&s, sizeof(student))) {
+  if (s.rollNo == roll) {
+   status = true;
+   break;
+  }
+ }
+ readFile.close();
+ if (status) {
+  cout << "--- RECORD FOUND ---" << endl;
+  cout << "Roll number:\t" << s.rollNo << endl;
+  cout << "Name:\t" << s.name << endl;
+  cout << "Division:\t" << s.div << endl;
+  cout << "Address:\t" << s.address << endl;
+  cout << "--- END OF RECORD ---" << endl;
+ } else {
+  cout << "Record not found." << endl;
+ }
+}
+void studentDatabase::deleteStudent() {
+ int roll;
+ student s;
+ bool status = false;
+ cout << "Roll number to delete:\t";
+ cin >> roll;
+ ifstream readFile;
+ readFile.open(fileName, ios::in | ios::binary);
+ ofstream writeFile;
+ writeFile.open("~" + fileName, ios::out | ios::binary);
+ writeFile.clear();
+ while (readFile.read((char*)&s, sizeof(student))) {
+  if (s.rollNo == roll) {
+   status = true;
+  } else {
+   writeFile.write((char*)&s, sizeof(student)) << flush;
+  }
+ }
+ readFile.close();
+ writeFile.close();
+ if (status) {
+  readFile.open("~" + fileName, ios::in | ios::binary);
+  writeFile.open(fileName, ios::out | ios::binary);
+  writeFile.clear();
+  writeFile << readFile.rdbuf();
+  readFile.close();
+  writeFile.close();
+  cout << "Record deleted." << endl;
+ } else {
+  cout << "Record not found." << endl;
+ }
+}
+void studentDatabase::addStudent() {
+ student s;
+ cout << "Roll number:\t";
+ cin >> s.rollNo;
+ cout << "Name:\t";
+ cin.ignore();
+ cin.getline(s.name, 50);
+ cout << "Division:\t";
+ cin >> s.div;
+ cout << "Address:\t";
+ cin.ignore();
+ cin.getline(s.address, 100);
+ ofstream file(fileName, ios::out | ios::binary | ios::app);
+ file.write((char*)&s, sizeof(student)) << flush;
+ if (file.fail()) {
+  cout << "Failed to add student record." << endl;
+ } else {
+  cout << "Student added successfully." << endl;
+ }
+ file.close();
+}
+void studentDatabase::displayAll() {
+ ifstream file;
+ student s;
+ int count = 0;
+ file.open(fileName, ios::in | ios::binary);
+ while (file.read((char*)&s, sizeof(student))) {
+  count++;
+  cout << count << ") ";
+  cout << s.rollNo << "|";
+  cout << s.name << "|";
+  cout << s.div << "|";
+  cout << s.address << endl;
+ }
+ if (count == 0) {
+  cout << "No records found." << endl;
+ }
+ file.close();
+}
+int main() {
+ int ch;
+ studentDatabase db;
+ do {
+  cout << endl;
+  cout << "--- MAIN MENU ---" << endl;
+  cout << "1 -> Add record" << endl;
+  cout << "2 -> Delete record" << endl;
+  cout << "3 -> Search record" << endl;
+  cout << "4 -> Display all records" << endl;
+  cout << "0 -> Exit" << endl << endl;
+  cout << "Choose an option (0-4):\t";
+  cin >> ch;
+  switch (ch) {
+   case 0:
+    cout << "\n\n// END OF CODE\n\n" << endl;
+    break;
+   case 1:
+    db.addStudent();
+    break;
+   case 2:
+    db.deleteStudent();
+    break;
+   case 3:
+    db.searchStudent();
+    break;
+   case 4:
+    cout << "All records are:\t" << endl;
+    db.displayAll();
+    break;
+   default:
+    cout << "Please choose a valid option (0-4):\t" << endl;
+    break;
+  }
+ } while (ch != 0);
+ return 0;
+}
+
+
+⚙️ STRUCTURE OVERVIEW
+Data Structure: student struct
+Fields:
+
+rollNo → int
+
+name[50] → char array
+
+div → single char (division)
+
+address[100] → char array
+
+File Used: "student_data.dat"
+(Binary file for storing student records)
+
+Class: studentDatabase
+
+Methods:
+
+addStudent()
+
+searchStudent()
+
+deleteStudent()
+
+displayAll()
+
+🔧 FUNCTION-WISE ALGORITHM
+🏁 Constructor: studentDatabase()
+Purpose: Ensure file exists when program starts.
+
+Try opening "student_data.dat" using fstream.
+
+If it fails → create a new file with ios::out.
+
+Display appropriate message:
+
+“New file created.” or “File already exists.”
+
+Close the file.
+
+➕ addStudent()
+Purpose: Add a new student record to the file.
+
+Take input from user:
+
+Roll number
+
+Name (with getline)
+
+Division
+
+Address
+
+Open file in append binary mode (ios::app | ios::binary)
+
+Write the student record using write()
+
+Close file and print success/failure message
+
+🔍 searchStudent()
+Purpose: Find and display a student by roll number.
+
+Ask user for roll number.
+
+Open file in read binary mode (ios::in | ios::binary)
+
+Loop through file:
+
+Read each student record
+
+If rollNo == input, store it and break loop
+
+Close file
+
+If found:
+
+Display full record details
+
+Else:
+
+Show "Record not found"
+
+❌ deleteStudent()
+Purpose: Delete a student record by roll number.
+
+Ask user for roll number.
+
+Open the main file in read mode and a temp file (~student_data.dat) in write mode
+
+Loop through each record:
+
+If rollNo != input, write it to the temp file
+
+Else, skip (deleting)
+
+Close both files.
+
+If found:
+
+Copy contents from temp file back to original file
+
+Delete temp file (optional but missing here)
+
+Confirm deletion
+
+Else:
+
+Inform that no record was found
+
+📜 displayAll()
+Purpose: Show all student records.
+
+Open file in read binary mode
+
+Initialize counter = 0
+
+Read each record in loop:
+
+Display in rollNo | name | div | address format
+
+Increment counter
+
+If no records (counter == 0), print “No records found.”
+
+Close file
+
+🧭 main()
+Purpose: Main menu loop.
+
+Create an object of studentDatabase
+
+Loop until user chooses exit:
+
+Show menu options
+
+Get user choice
+
+Call respective method:
+
+1 → Add
+
+2 → Delete
+
+3 → Search
+
+4 → Display all
+
+0 → Exit

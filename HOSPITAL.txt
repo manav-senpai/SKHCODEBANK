@@ -1,0 +1,232 @@
+#include<iostream>
+#include<string>
+#include <list>
+using namespace std;
+// creating LinkList
+class Node
+{
+ public :
+ Node *next;
+ int priority;
+ string data;
+ Node(string d,int prior){
+ priority = prior;
+ data = d;
+ next = NULL;
+ }
+};
+class PriorityQueue{
+ public:
+ Node *front=NULL;
+
+ //d is patient name , prior is priority
+ void insert(string d,int prior){
+ Node *temp,*rear;
+ temp = new Node(d,prior);
+ if(front == NULL){
+ front = temp;
+ }
+ else
+ {
+ //compare until position is found
+ rear = front;
+ while(
+ rear->next!=NULL &&
+ rear->next->priority >= prior
+ ){
+ rear=rear->next;
+ }
+ temp->next = rear->next;
+ rear->next = temp;
+ }
+ }
+ //to get name of first patient
+ void peek(){
+ cout<<"First patient is:\t"<<front->data;
+ }
+ void pop(){
+ //to remove first patient
+ if(front==NULL)
+ return;
+ front=front->next;
+ }
+ //display all the queue
+ void dis()
+ {
+ string currPrior="";
+ if(front== NULL){
+ cout<<endl<<"Empty queue."<<endl;
+ return;
+ }
+ cout<<endl;
+ Node *curr= front;
+ while(curr!=NULL){
+ //hardCode the category
+ if(curr->priority!=0){
+ if(curr->priority==3)
+ currPrior="Serious patient";
+ else if(curr->priority==2)
+ currPrior="Not serious patient";
+ else
+ currPrior="General checkup";
+ }
+ cout<<curr->data<<" with priority:\t"<<currPrior<<endl;
+ curr=curr->next;
+ }
+ }
+};
+int main(){
+ string name;
+ int priority,ch;
+ cout<<endl;
+ PriorityQueue q;
+ do{
+ cout<<endl<<"--- MAIN MENU ---";
+ cout<<endl<<"1 -> Add patient";
+ cout<<endl<<"2 -> Remove patient";
+ cout<<endl<<"3 -> Get all patients";
+ cout<<endl<<"0 -> Exit";
+ cout<<endl<<"Choose an option (0-3):\t";
+ cin>>ch;
+
+ switch (ch)
+ {
+ case 1:
+ {
+ cout<<"Patient name is:\t";
+ cin.ignore();
+ getline(cin,name,'\n');
+ cout<<endl<<"Enter priority (3-High, 2-Medium, 1-General):\t";
+ cin>>priority;
+ q.insert(name,priority);
+ break;
+ }
+ case 2:
+ {
+ q.pop();
+ break;
+ }
+ case 3:{
+ q.dis();
+ break;
+ }
+ case 0:
+ cout<<endl<<"// END OF CODE\n\n";
+ exit(1);
+ break;
+
+ default:
+ break;
+ }
+ } while(ch!=0);
+}
+
+
+
+⚙️ STRUCTURE OVERVIEW
+Each Node = a patient with:
+
+data → patient name
+
+priority → 3 (high), 2 (medium), 1 (low)
+
+next → link to next node
+
+PriorityQueue class handles:
+
+Insertion based on priority
+
+Displaying queue
+
+Removing first patient (like a dequeue)
+
+Peeking the front
+
+🌀 FUNCTION-WISE ALGORITHMS
+🧾 insert(string d, int prior)
+Purpose: Adds a patient to the queue based on their priority (descending order).
+
+Create a new Node with name and priority
+
+If the queue is empty:
+
+Set front = new node
+
+Else:
+
+Start from front (rear = front)
+
+Traverse until you find a node with lower priority
+
+(rear->next->priority >= prior)
+
+Insert new node after that
+
+Maintain next links properly
+
+🔍 peek()
+Purpose: Display name of patient at the front of the queue.
+
+Just print front->data
+
+❌ pop()
+Purpose: Removes the first patient (the one being treated).
+
+If queue is empty, return
+
+Else, move front to the next node (front = front->next)
+
+📋 dis()
+Purpose: Display the full patient queue with categories.
+
+If queue is empty → print "Empty queue"
+
+Else:
+
+Traverse from front to end
+
+For each node:
+
+Map the priority:
+
+3 → "Serious patient"
+
+2 → "Not serious patient"
+
+1 → "General checkup"
+
+Print name with mapped priority
+
+🧠 main()
+Purpose: Menu-driven interface for patient management.
+
+Loop until user exits:
+
+Show options:
+
+1 → Add patient
+
+2 → Remove patient
+
+3 → Display all patients
+
+0 → Exit
+
+Based on choice:
+
+Get name and priority, insert
+
+Pop first patient
+
+Display queue
+
+Exit
+
+📌 PRIORITY LOGIC SUMMARY
+3 = high urgency → comes first
+
+2 = medium urgency → middle
+
+1 = general → last
+
+Patients with same priority are added in order of arrival
